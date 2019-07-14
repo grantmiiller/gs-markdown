@@ -72,3 +72,4 @@ func TestNilTokenIsNil(t *testing.T) {
 		t.Errorf("Token should not be nil")
 	}
 }
+

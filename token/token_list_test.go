@@ -38,6 +38,25 @@ func TestAppend(t *testing.T) {
 	}
 }
 
+func TestSlice(t *testing.T) {
+	var tl TokenList
+	tl = tl.Append(
+		BaseToken{t_type: UNDERSCORE_TYPE, value: "_"},
+		BaseToken{t_type: TEXT_TYPE, value: "A Silly String"},
+		BaseToken{t_type: UNDERSCORE_TYPE, value: "_"},
+		BaseToken{t_type: STAR_TYPE, value: "*"},
+	)
+
+	newList := tl.Slice(2, 4)
+	if newList.Length() != 2 {
+		t.Errorf("The returns list should be 2")
+	}
+
+	if token, _ := newList.Get(1); token.TokenType() != STAR_TYPE {
+		t.Errorf("Index 1 should be STAR_TYPE")
+	}
+}
+
 func TestPeek(t *testing.T) {
 	var tl TokenList
 	tl = tl.Append(
@@ -53,5 +72,57 @@ func TestPeek(t *testing.T) {
 
 	if !tl.Peek([]string{UNDERSCORE_TYPE, TEXT_TYPE, UNDERSCORE_TYPE}) {
 		t.Errorf("Should be true due to matching types")
+	}
+}
+
+func TestFindTokenType(t *testing.T) {
+	var tl TokenList
+	tl = tl.Append(
+		BaseToken{t_type: UNDERSCORE_TYPE, value: "_"},
+		BaseToken{t_type: TEXT_TYPE, value: "A Silly String"},
+		BaseToken{t_type: UNDERSCORE_TYPE, value: "_"},
+		BaseToken{t_type: NEWLINE_TYPE, value: "\n"},
+		BaseToken{t_type: STAR_TYPE, value: "*"},
+	)
+
+	// Should find the newline token at index 3
+	if i, _ := tl.FindTokenType(NEWLINE_TYPE, 0); i != 3 {
+		t.Errorf("NEWLINE_TYPE should be found at index of 3, not %d", i)
+	}
+
+	// Should return -1 and error if index is out of range
+	if i, err := tl.FindTokenType(NEWLINE_TYPE, 5); i != -1 || err == nil {
+		t.Errorf("Should return -1 and an error when index is out of range")
+	}
+
+	// Should return -1 and error if index is out of range
+	if i, err := tl.FindTokenType("ALYINGTYPETHATISFAKE", 0); i != -1 || err == nil {
+		t.Errorf("Should return -1 and an error when type isn't found")
+	}
+}
+
+func TestPeekAt(t *testing.T) {
+	var tl TokenList
+
+	tl = tl.Append(
+		BaseToken{t_type: UNDERSCORE_TYPE, value: "_"},
+		BaseToken{t_type: TEXT_TYPE, value: "A Silly String"},
+		BaseToken{t_type: UNDERSCORE_TYPE, value: "_"},
+		BaseToken{t_type: NEWLINE_TYPE, value: "\n"},
+		BaseToken{t_type: STAR_TYPE, value: "*"},
+	)
+
+	// Should find the newline token at index 3
+	if !tl.PeekAt(UNDERSCORE_TYPE, 2) {
+		t.Errorf("Should return true")
+	}
+
+	// Should return false if index is out of range
+	if tl.PeekAt(UNDERSCORE_TYPE, 5) {
+		t.Errorf("Should return false")
+	}
+
+	if !tl.PeekAt(TEXT_TYPE, 1) {
+		t.Errorf("Should return true")
 	}
 }

@@ -37,6 +37,11 @@ func (t TokenList) Length() int {
 	return len(t.tokens)
 }
 
+// Slice returns a new TokenList with the underlying slice of tokens
+func (t TokenList) Slice(start int, end int) TokenList {
+	return TokenList{tokens: t.All()[start:end]}
+}
+
 // Peek checks to see if token in list match the passed list of types
 // and returns true if they match, or false if they do not
 func (t TokenList) Peek(types []string) bool {
@@ -49,4 +54,36 @@ func (t TokenList) Peek(types []string) bool {
 		}
 	}
 	return true
+}
+
+const (
+	INDEX_ERROR = "Index out of range"
+	TYPE_ERROR  = "Could not find token of that type"
+)
+
+// FindTokenType returns the index of the first instance of t_type passed
+// or returns -1 and an error if index is out of range or token cannot be found
+func (t TokenList) FindTokenType(t_type string, index int) (int, error) {
+	if t.Length() <= index {
+		return -1, errors.New(INDEX_ERROR)
+	}
+	for i, token := range t.All()[index:] {
+		if token.TokenType() == t_type {
+			return i, nil
+		}
+	}
+	return -1, errors.New(TYPE_ERROR)
+}
+
+// PeekAt returns true or false if the token type matches the token at index
+func (t TokenList) PeekAt(t_type string, index int) bool {
+	if t.Length() <= index {
+		return false
+	}
+
+	if t.All()[index].TokenType() == t_type {
+		return true
+	}
+
+	return false
 }

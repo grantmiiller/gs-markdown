@@ -1,5 +1,9 @@
 package parser
 
+// Theory:
+// Split the tokens based on newlines into paragraph and line items
+// Then parse the new lines for the "styling" markdown
+
 type Node struct {
 	n_type   string
 	value    string
