@@ -1,4 +1,4 @@
-package token
+package gs_mkdown
 
 import (
 	"reflect"
@@ -8,13 +8,13 @@ import (
 func TestNewToken(t *testing.T) {
 	_, err := NewToken("", "derp")
 	if err == nil {
-		t.Errorf("An empty t_type should throw an error")
+		t.Errorf("An empty tType should throw an error")
 	}
 
-	t1, err := NewToken(NIL_TYPE, "")
+	t1, err := NewToken(NilType, "")
 	name1 := reflect.TypeOf(t1).Name()
 	if name1 != "nilToken" {
-		t.Errorf("Token with passed NIL_TYPE should be nilToken")
+		t.Errorf("Token with passed NilType should be nilToken")
 	}
 
 }
@@ -46,7 +46,7 @@ func TestTokenIsPresent(t *testing.T) {
 }
 
 func TestTokenValue(t *testing.T) {
-	t1, _ := NewToken(TEXT_TYPE, "Boop")
+	t1, _ := NewToken(TextType, "Boop")
 	if t1.Value() != "Boop" {
 		t.Errorf("Should return value of original test string")
 	}
@@ -54,8 +54,8 @@ func TestTokenValue(t *testing.T) {
 
 func TestNilTokenIsTypeNil(t *testing.T) {
 	t1, _ := NewNilToken()
-	if t1.t_type != NIL_TYPE {
-		t.Errorf("Token should be t_type of NIL_TYPE")
+	if t1.tType != NilType {
+		t.Errorf("Token should be tType of NilType")
 	}
 }
 
@@ -72,4 +72,3 @@ func TestNilTokenIsNil(t *testing.T) {
 		t.Errorf("Token should not be nil")
 	}
 }
-

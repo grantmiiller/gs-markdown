@@ -1,4 +1,4 @@
-package token
+package gs_mkdown
 
 import (
 	"errors"
@@ -8,20 +8,20 @@ import (
 type SimpleScanner struct{}
 
 const (
-	NIL_TYPE        = "NIL"
-	EOF_TYPE        = "EOF"
-	TEXT_TYPE       = "TEXT"
-	UNDERSCORE_TYPE = "UNDERSCORE"
-	STAR_TYPE       = "STAR"
-	NEWLINE_TYPE    = "NEWLINE"
-	HASH_TYPE       = "HASH"
+	NilType        = "NIL"
+	EOFType        = "EOF"
+	TextType       = "TEXT"
+	UnderscoreType = "UNDERSCORE"
+	StarType       = "STAR"
+	NewlineType    = "NEWLINE"
+	HashType       = "HASH"
 )
 
 var TOKEN_TYPES = map[string]string{
-	"_":  UNDERSCORE_TYPE,
-	"*":  STAR_TYPE,
-	"#":  HASH_TYPE,
-	"\n": NEWLINE_TYPE,
+	"_":  UnderscoreType,
+	"*":  StarType,
+	"#":  HashType,
+	"\n": NewlineType,
 }
 
 // FromString grabs the first character in string and attempts to find a
@@ -31,8 +31,8 @@ func (scanner SimpleScanner) FromString(s string) (Token, error) {
 		value := string([]rune(s)[0])
 		// If our map of values contains the character, return a Token
 
-		if t_type, ok := TOKEN_TYPES[value]; ok {
-			return NewToken(t_type, value)
+		if tType, ok := TOKEN_TYPES[value]; ok {
+			return NewToken(tType, value)
 		}
 	}
 	return NewNilToken()
@@ -56,7 +56,7 @@ func (scanner TextScanner) FromString(s string) (Token, error) {
 		}
 	}
 	if len(text) > 0 {
-		return NewToken(TEXT_TYPE, strings.Join(text, ""))
+		return NewToken(TextType, strings.Join(text, ""))
 	}
 	return NewNilToken()
 }
@@ -66,7 +66,7 @@ var scanners = []TokenScanner{SimpleScanner{}, TextScanner{}}
 func Tokenize(s string) (TokenList, error) {
 	var tokenList TokenList
 	if s == "" {
-		t, err := NewToken(EOF_TYPE, "")
+		t, err := NewToken(EOFType, "")
 		if err != nil {
 			return tokenList, err
 		}

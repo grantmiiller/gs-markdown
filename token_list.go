@@ -1,4 +1,4 @@
-package token
+package gs_mkdown
 
 import "errors"
 
@@ -61,14 +61,14 @@ const (
 	TYPE_ERROR  = "Could not find token of that type"
 )
 
-// FindTokenType returns the index of the first instance of t_type passed
+// FindTokenType returns the index of the first instance of tType passed
 // or returns -1 and an error if index is out of range or token cannot be found
-func (t TokenList) FindTokenType(t_type string, index int) (int, error) {
+func (t TokenList) FindTokenType(tType string, index int) (int, error) {
 	if t.Length() <= index {
 		return -1, errors.New(INDEX_ERROR)
 	}
 	for i, token := range t.All()[index:] {
-		if token.TokenType() == t_type {
+		if token.TokenType() == tType {
 			return i, nil
 		}
 	}
@@ -76,12 +76,12 @@ func (t TokenList) FindTokenType(t_type string, index int) (int, error) {
 }
 
 // PeekAt returns true or false if the token type matches the token at index
-func (t TokenList) PeekAt(t_type string, index int) bool {
+func (t TokenList) PeekAt(tType string, index int) bool {
 	if t.Length() <= index {
 		return false
 	}
 
-	if t.All()[index].TokenType() == t_type {
+	if t.All()[index].TokenType() == tType {
 		return true
 	}
 

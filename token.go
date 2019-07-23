@@ -1,4 +1,4 @@
-package token
+package gs_mkdown
 
 import (
 	"errors"
@@ -15,18 +15,18 @@ type Token interface {
 }
 
 type BaseToken struct {
-	t_type string
-	value  string
+	tType string
+	value string
 }
 
 // NewToken returns a new BaseToken or NilToken, depending on passed value of
-// t_type
-func NewToken(t_type string, value string) (Token, error) {
-	if t_type == "" {
+// tType
+func NewToken(tType string, value string) (Token, error) {
+	if tType == "" {
 		return BaseToken{}, errors.New("A token type is required")
 	}
 
-	if t_type == NIL_TYPE {
+	if tType == NilType {
 		t, err := NewNilToken()
 		if err != nil {
 			return BaseToken{}, errors.New("A token type is required")
@@ -34,13 +34,13 @@ func NewToken(t_type string, value string) (Token, error) {
 		return t, nil
 	}
 
-	t := BaseToken{t_type, value}
+	t := BaseToken{tType, value}
 	return t, nil
 }
 
 // ToString prints the properties of the token
 func (t BaseToken) ToString() {
-	fmt.Printf("<type: %s, value: %s>\n", t.t_type, t.value)
+	fmt.Printf("<type: %s, value: %s>\n", t.tType, t.value)
 }
 
 // Length returns how many characters are in the value property string
@@ -48,9 +48,9 @@ func (t BaseToken) Length() int {
 	return len([]rune(t.value))
 }
 
-// TokenType returns the value in t_type property
+// TokenType returns the value in tType property
 func (t BaseToken) TokenType() string {
-	return t.t_type
+	return t.tType
 }
 
 // Value returns the value in value property
@@ -72,7 +72,7 @@ type nilToken struct {
 }
 
 func NewNilToken() (nilToken, error) {
-	return nilToken{BaseToken{NIL_TYPE, ""}}, nil
+	return nilToken{BaseToken{NilType, ""}}, nil
 }
 
 func (t nilToken) IsNil() bool {

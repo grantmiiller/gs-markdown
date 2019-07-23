@@ -1,4 +1,4 @@
-package token
+package gs_mkdown
 
 import (
 	"testing"
@@ -17,14 +17,14 @@ func TestSimpleScannerFromString(t *testing.T) {
 	// An empty string should return a nil type
 	t2, _ := SimpleScanner{}.FromString("")
 
-	if t2.TokenType() != NIL_TYPE {
-		t.Errorf("Returned Token should be NIL_TYPE")
+	if t2.TokenType() != NilType {
+		t.Errorf("Returned Token should be NilType")
 	}
 
-	// An unknown first rune should return a NIL_TYPE
+	// An unknown first rune should return a NilType
 	t3, _ := SimpleScanner{}.FromString("你好")
-	if t3.TokenType() != NIL_TYPE {
-		t.Errorf("Returned Token should be NIL_TYPE")
+	if t3.TokenType() != NilType {
+		t.Errorf("Returned Token should be NilType")
 	}
 }
 
@@ -32,8 +32,8 @@ func TestTextScannerFromString(t *testing.T) {
 	// Texting a "normal" string
 	t1, _ := TextScanner{}.FromString("A Long String of Text")
 
-	if t1.TokenType() != TEXT_TYPE {
-		t.Errorf("Returned Token should be TEXT_TYPE, not %s", t1.TokenType())
+	if t1.TokenType() != TextType {
+		t.Errorf("Returned Token should be TextType, not %s", t1.TokenType())
 	}
 
 	if t1.Value() != "A Long String of Text" {
@@ -44,22 +44,22 @@ func TestTextScannerFromString(t *testing.T) {
 	// Should return nil, because it would pick up the special character
 	t2, _ := TextScanner{}.FromString("_Not*asMuch\nText")
 
-	if t2.TokenType() != NIL_TYPE {
-		t.Errorf("Returned Token should be NIL_TYPE, not %s", t2.TokenType())
+	if t2.TokenType() != NilType {
+		t.Errorf("Returned Token should be NilType, not %s", t2.TokenType())
 	}
 }
 
 func TestScanOneToken(t *testing.T) {
 	t1, _ := ScanOneToken("_Boop")
 
-	if t1.TokenType() != UNDERSCORE_TYPE {
-		t.Errorf("Returned Token should be UNDERSCORE_TYPE, not %s", t1.TokenType())
+	if t1.TokenType() != UnderscoreType {
+		t.Errorf("Returned Token should be UnderscoreType, not %s", t1.TokenType())
 	}
 
 	t2, _ := ScanOneToken("Boop_")
 
-	if t2.TokenType() != TEXT_TYPE {
-		t.Errorf("Returned Token should be TEXT_TYPE, not %s", t2.TokenType())
+	if t2.TokenType() != TextType {
+		t.Errorf("Returned Token should be TextType, not %s", t2.TokenType())
 	}
 
 	if t2.Value() != "Boop" {
@@ -71,13 +71,13 @@ func TestTokenize(t *testing.T) {
 	tokenList, _ := Tokenize("_Boop*Test")
 
 	token, _ := tokenList.Get(0)
-	if token.TokenType() != UNDERSCORE_TYPE {
-		t.Errorf("Returned Token should be UNDERSCORE_TYPE, not %s", token.TokenType())
+	if token.TokenType() != UnderscoreType {
+		t.Errorf("Returned Token should be UnderscoreType, not %s", token.TokenType())
 	}
 
 	token, _ = tokenList.Get(1)
-	if token.TokenType() != TEXT_TYPE {
-		t.Errorf("Returned Token should be TEXT_TYPE, not %s", token.TokenType())
+	if token.TokenType() != TextType {
+		t.Errorf("Returned Token should be TextType, not %s", token.TokenType())
 	}
 
 	if token.Value() != "Boop" {
@@ -85,13 +85,13 @@ func TestTokenize(t *testing.T) {
 	}
 
 	token, _ = tokenList.Get(2)
-	if token.TokenType() != STAR_TYPE {
-		t.Errorf("Returned Token should be STAR_TYPE, not %s", token.TokenType())
+	if token.TokenType() != StarType {
+		t.Errorf("Returned Token should be StarType, not %s", token.TokenType())
 	}
 
 	token, _ = tokenList.Get(3)
-	if token.TokenType() != TEXT_TYPE {
-		t.Errorf("Returned Token should be TEXT_TYPE, not %s", token.TokenType())
+	if token.TokenType() != TextType {
+		t.Errorf("Returned Token should be TextType, not %s", token.TokenType())
 	}
 
 	if token.Value() != "Test" {
@@ -111,12 +111,12 @@ func TestTokenizeMultiLine(t *testing.T) {
 	}
 
 	token, _ := tokenList.Get(1)
-	if token.TokenType() != NEWLINE_TYPE {
-		t.Errorf("Returned Token should be NEWLINE_TYPE, not %s", token.TokenType())
+	if token.TokenType() != NewlineType {
+		t.Errorf("Returned Token should be NewlineType, not %s", token.TokenType())
 	}
 
 	token, _ = tokenList.Get(10)
-	if token.TokenType() != EOF_TYPE {
+	if token.TokenType() != EOFType {
 		t.Errorf("Returned Token should be EOF, not %s", token.TokenType())
 	}
 }
