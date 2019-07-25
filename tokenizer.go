@@ -15,6 +15,7 @@ const (
 	StarType       = "STAR"
 	NewlineType    = "NEWLINE"
 	HashType       = "HASH"
+	DashType       = "DASH"
 )
 
 var TOKEN_TYPES = map[string]string{

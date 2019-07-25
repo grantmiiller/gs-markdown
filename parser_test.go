@@ -36,3 +36,29 @@ func bodyParserNoEOFTest(t *testing.T) {
 		t.Errorf("Should have thrown an error")
 	}
 }
+
+func TextParserTest(t *testing.T) {
+	var tl TokenList
+
+	tl.Append(
+		BaseToken{tType: TextType, value: "This story is"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: TextType, value: "EPIC"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+	)
+
+	nl, err := TextParser(tl)
+
+	if err != nil {
+		t.Errorf("Should not have errored")
+	}
+
+	if nl[0].nType != TextNode {
+		t.Errorf("Should equal TextNode, not %s", nl[0].nType)
+	}
+	if nl[1].nType != BoldNode && nl[1].value != "EPIC" {
+		t.Errorf("Node should equal BoldNode, not %s, and have value of EPIC, not %s", nl[1].nType, nl[1].value)
+	}
+}
