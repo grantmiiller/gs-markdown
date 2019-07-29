@@ -1,10 +1,10 @@
 package gs_mkdown
 
-import "testing"
+import (
+	"testing"
+)
 
-// Tests that "orphan" newlines are handled
-// TODO: add test if newline is orphaned in middle of processing
-func bodyParserLoneNewLineTest(t *testing.T) {
+func BodyParserLoneNewLineTest(t *testing.T) {
 	var tl TokenList
 
 	tl.Append(
@@ -22,8 +22,7 @@ func bodyParserLoneNewLineTest(t *testing.T) {
 	}
 }
 
-// Test that BodyParser errors when there is no EOF token at the end
-func bodyParserNoEOFTest(t *testing.T) {
+func BodyParserNoEOFTest(t *testing.T) {
 	var tl TokenList
 
 	tl.Append(
@@ -60,5 +59,32 @@ func TextParserTest(t *testing.T) {
 	}
 	if nl[1].nType != BoldNode && nl[1].value != "EPIC" {
 		t.Errorf("Node should equal BoldNode, not %s, and have value of EPIC, not %s", nl[1].nType, nl[1].value)
+	}
+}
+
+func ListParserUnorderedTest(t *testing.T) {
+	var tl TokenList
+
+	tl.Append(
+		BaseToken{tType: DashType, value: "-"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: TextType, value: "EPIC"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: DashType, value: "-"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: DashType, value: "-"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: NewlineType, value: "\n"},
+	)
+
+	node, _ := ListParser(tl)
+
+	if len(node.nodes) != 3 {
+		t.Errorf("There should be 3 nodes, not %d", len(node.nodes))
 	}
 }

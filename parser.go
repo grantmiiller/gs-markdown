@@ -25,6 +25,8 @@ const (
 	UnorderedNode = "UNORDERED"
 	OrderedNode   = "ORDERED"
 
+	ListItemNode = "LIST"
+
 	NoEOFTokenError      = "No EOF token found, bailing early"
 	UnexpectedTokenError = "Ran into a token not able to handle"
 )
@@ -81,6 +83,51 @@ func TextParser(tl TokenList) ([]Node, error) {
 	return nl, nil
 }
 
+func ListParser(tl TokenList) (Node, error) {
+	node := Node{nType: NilNode, consumed: 0}
+	lastType := "None"
+
+	for {
+		t, _ := tl.Get(tl.Length() - 1)
+		tType := t.TokenType()
+		if tType != DashType || (lastType != "None" && lastType != tType) {
+			// OR if token type does not equal an integer (for ordered lists)
+			// If we can't find the token we are looking for, what we have
+			break
+		}
+
+		lastType = tType
+
+		// Find the next Newline token, start at one since the 1st token is already known
+		index, err := tl.FindTokenType(NewlineType, 1)
+		// If we don't find the Newline, try to find EOFType
+		if index == -1 || err != nil {
+			index, _ = tl.FindTokenType(EOFType, 1)
+			if index == -1 || err != nil {
+				// If we still can't find it, return what we have
+				break
+			}
+		}
+
+		// Do same check for integer and finding ordered list
+		if node.nType == NilNode && tType == DashType {
+			node.nType = UnorderedNode
+		}
+
+		processedNodes, err := TextParser(tl.Slice(1, index))
+		if err != nil {
+			node.consumed = node.consumed + index + 1
+			node.nodes = append(node.nodes, Node{
+				nType:    ListItemNode,
+				consumed: index + 1,
+				nodes:    processedNodes,
+			})
+			tl = tl.Slice(0, index+1)
+		}
+	}
+	return node, nil
+}
+
 func BodyParser(tl TokenList) (Node, error) {
 	// If last token isn't EOF, throw an error
 	if t, _ := tl.Get(tl.Length() - 1); t.TokenType() != EOFType {
@@ -119,6 +166,12 @@ func BodyParser(tl TokenList) (Node, error) {
 		}
 
 		// Process Newline for Ordered List or Un-Ordered List
+		lNode, err := ListParser(tl)
+		if lNode.nType != NilNode && err != nil {
+			consumed = consumed + lNode.consumed
+			nl = append(nl, lNode)
+			tl = tl.Slice(lNode.consumed-1, tl.Length())
+		}
 		// If first node is Dash or Number
 		// Return new nodes, non-processed tokens, and consumed amount
 		// Plus consumed to consumed amount
