@@ -1,6 +1,9 @@
 package gs_mkdown
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // TODO:
 // - Create Style Parser, should contain:
@@ -88,7 +91,7 @@ func ListParser(tl TokenList) (Node, error) {
 	lastType := "None"
 
 	for {
-		t, _ := tl.Get(tl.Length() - 1)
+		t, _ := tl.Get(0)
 		tType := t.TokenType()
 		if tType != DashType || (lastType != "None" && lastType != tType) {
 			// OR if token type does not equal an integer (for ordered lists)
@@ -102,7 +105,8 @@ func ListParser(tl TokenList) (Node, error) {
 		index, err := tl.FindTokenType(NewlineType, 1)
 		// If we don't find the Newline, try to find EOFType
 		if index == -1 || err != nil {
-			index, _ = tl.FindTokenType(EOFType, 1)
+			index, err = tl.FindTokenType(EOFType, 1)
+			fmt.Printf("%d\n", index)
 			if index == -1 || err != nil {
 				// If we still can't find it, return what we have
 				break
@@ -113,16 +117,17 @@ func ListParser(tl TokenList) (Node, error) {
 		if node.nType == NilNode && tType == DashType {
 			node.nType = UnorderedNode
 		}
-
 		processedNodes, err := TextParser(tl.Slice(1, index))
-		if err != nil {
+		if err == nil {
 			node.consumed = node.consumed + index + 1
 			node.nodes = append(node.nodes, Node{
 				nType:    ListItemNode,
 				consumed: index + 1,
 				nodes:    processedNodes,
 			})
-			tl = tl.Slice(0, index+1)
+			tl = tl.Slice(index+1, tl.Length())
+		} else {
+			return node, err
 		}
 	}
 	return node, nil

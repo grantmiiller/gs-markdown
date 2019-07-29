@@ -90,6 +90,10 @@ func TestFindTokenType(t *testing.T) {
 		t.Errorf("NewlineType should be found at index of 3, not %d", i)
 	}
 
+	if i, _ := tl.FindTokenType(StarType, 1); i != 4 {
+		t.Errorf("NewlineType should be found at index of 3, not %d", i)
+	}
+
 	// Should return -1 and error if index is out of range
 	if i, err := tl.FindTokenType(NewlineType, 5); i != -1 || err == nil {
 		t.Errorf("Should return -1 and an error when index is out of range")
@@ -124,5 +128,26 @@ func TestPeekAt(t *testing.T) {
 
 	if !tl.PeekAt(TextType, 1) {
 		t.Errorf("Should return true")
+	}
+}
+
+func TestTokenGet(t *testing.T) {
+	var tl TokenList
+
+	tl = tl.Append(
+		BaseToken{tType: UnderscoreType, value: "_"},
+		BaseToken{tType: TextType, value: "A Silly String"},
+		BaseToken{tType: UnderscoreType, value: "_"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: StarType, value: "*"},
+	)
+	tk, _ := tl.Get(tl.Length() - 1)
+	if tk.TokenType() != StarType {
+		t.Errorf("Returned type should be StarType, not %s", tk.TokenType())
+	}
+
+	tk, err := tl.Get(tl.Length())
+	if err == nil {
+		t.Errorf("Should return an out of bounds error")
 	}
 }

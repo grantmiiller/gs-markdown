@@ -1,6 +1,8 @@
 package gs_mkdown
 
-import "errors"
+import (
+	"errors"
+)
 
 type TokenList struct {
 	tokens []Token
@@ -21,7 +23,7 @@ func (t TokenList) Append(tokens ...Token) TokenList {
 
 // Get returns the token at a given index, or returns an erro
 func (t TokenList) Get(i int) (Token, error) {
-	if i < len(t.tokens) {
+	if i < t.Length() && i >= 0 {
 		return t.tokens[i], nil
 	}
 	return BaseToken{}, errors.New("Index out of range")
@@ -69,7 +71,7 @@ func (t TokenList) FindTokenType(tType string, index int) (int, error) {
 	}
 	for i, token := range t.All()[index:] {
 		if token.TokenType() == tType {
-			return i, nil
+			return i + index, nil
 		}
 	}
 	return -1, errors.New(TYPE_ERROR)
