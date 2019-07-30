@@ -36,6 +36,37 @@ func TestBodyParserNoEOF(t *testing.T) {
 	}
 }
 
+func TestBodyParserAllAtIt(t *testing.T) {
+	var tl TokenList
+
+	tl = tl.Append(
+		BaseToken{tType: DashType, value: "-"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: TextType, value: "EPIC"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: DashType, value: "-"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: DashType, value: "-"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: EOFType, value: ""},
+	)
+	node, _ := BodyParser(tl)
+
+	if node.nType != BodyNode {
+		t.Errorf("Node should be body type, not %s", node.nType)
+	}
+
+}
+
 func TestTextParser(t *testing.T) {
 	var tl TokenList
 
@@ -80,12 +111,44 @@ func TestListParserUnordered(t *testing.T) {
 		BaseToken{tType: TextNode, value: "Testing"},
 		BaseToken{tType: EOFType, value: ""},
 	)
+
 	node, _ := ListParser(tl)
 	if len(node.nodes) != 3 {
 		t.Errorf("There should be 3 nodes, not %d", len(node.nodes))
 	}
 
 	if node.nodes[0].nodes[0].nType != BoldNode {
-		t.Errorf("Should be a bold node, not %s", node.nodes[0].nodes[0].value)
+		t.Errorf("Should be a bold node, not %s", node.nodes[0].nodes[0].nType)
+	}
+
+	if node.nodes[2].nodes[0].nType != TextNode {
+		t.Errorf("Should be a text node, not %s", node.nodes[2].nodes[0].nType)
+	}
+}
+
+func TestParagrahParser(t *testing.T) {
+	var tl TokenList
+	tl = tl.Append(
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: TextType, value: "EPIC"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: StarType, value: "*"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: NewlineType, value: "\n"},
+		BaseToken{tType: TextNode, value: "Testing"},
+		BaseToken{tType: EOFType, value: ""},
+	)
+	node, _ := ParagraphParser(tl)
+
+	if node.nType != ParagraphNode {
+		t.Errorf("Should be a paragraph node, not %s", node.nType)
+	}
+
+	if node.nodes[0].nType != BoldNode {
+		t.Errorf("Should be a paragraph node, not %s", node.nodes[0].nType)
 	}
 }

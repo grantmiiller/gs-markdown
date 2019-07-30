@@ -19,11 +19,12 @@ type Node struct {
 }
 
 const (
-	NullNode = "NULL"
-	BoldNode = "BOLD"
-	BodyNode = "BODY"
-	NilNode  = "NIL"
-	TextNode = "TEXT"
+	NullNode      = "NULL"
+	BoldNode      = "BOLD"
+	BodyNode      = "BODY"
+	NilNode       = "NIL"
+	TextNode      = "TEXT"
+	ParagraphNode = "PARAGRAPH"
 
 	UnorderedNode = "UNORDERED"
 	OrderedNode   = "ORDERED"
@@ -133,6 +134,43 @@ func ListParser(tl TokenList) (Node, error) {
 	return node, nil
 }
 
+func ParagraphParser(tl TokenList) (Node, error) {
+	node := Node{nType: NilNode, consumed: 0}
+	cursor := 0
+	for {
+		index, err := tl.FindTokenType(NewlineType, cursor)
+		fmt.Printf("%d", index)
+		if index != -1 && err == nil {
+			nextToken, _ := tl.Get(index + 1)
+			nextType := nextToken.TokenType()
+			if nextType != NewlineType && nextType != EOFType {
+				cursor = index
+				continue
+			} else {
+				processedNodes, err := TextParser(tl.Slice(0, index))
+				if err == nil {
+					node.nType = ParagraphNode
+					node.consumed = node.consumed + index + 2
+					node.nodes = processedNodes
+					break
+				} else {
+					return node, err
+				}
+			}
+		} else {
+			node.nType = ParagraphNode
+			processedNodes, err := TextParser(tl)
+			if err == nil {
+				node.consumed = tl.Length()
+				node.nodes = processedNodes
+				break
+			}
+			return node, err
+		}
+	}
+	return node, nil
+}
+
 func BodyParser(tl TokenList) (Node, error) {
 	// If last token isn't EOF, throw an error
 	if t, _ := tl.Get(tl.Length() - 1); t.TokenType() != EOFType {
@@ -150,7 +188,7 @@ func BodyParser(tl TokenList) (Node, error) {
 			break
 		}
 
-		// We are checking a couple things with the first tokn
+		// We are checking a couple things with the first token
 		t1, err := tl.Get(0)
 		if err != nil {
 			return Node{}, err
@@ -161,6 +199,7 @@ func BodyParser(tl TokenList) (Node, error) {
 		if t1.TokenType() == NewlineType {
 			tl = tl.Slice(1, tl.Length())
 			consumed++
+			continue
 		}
 
 		// If first token is EOFType, we are done. Return what we have as a
@@ -176,16 +215,17 @@ func BodyParser(tl TokenList) (Node, error) {
 			consumed = consumed + lNode.consumed
 			nl = append(nl, lNode)
 			tl = tl.Slice(lNode.consumed-1, tl.Length())
+			continue
 		}
-		// If first node is Dash or Number
-		// Return new nodes, non-processed tokens, and consumed amount
-		// Plus consumed to consumed amount
 
-		// Process Paragraph Nodes
-		// Make a paragraph Node
-		// Return new nodes, non-processed tokens, and consumed amount
-		// Plus to consumed amount
-
+		pNode, err := ParagraphParser(tl)
+		if pNode.nType != NilNode && err != nil {
+			consumed = consumed + pNode.consumed
+			nl = append(nl, pNode)
+			tl = tl.Slice(pNode.consumed-1, tl.Length())
+			continue
+		}
+		break
 	}
 	return NewNode(BodyNode, "", consumed, nl), nil
 }
