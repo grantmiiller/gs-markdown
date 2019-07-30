@@ -36,37 +36,6 @@ func TestBodyParserNoEOF(t *testing.T) {
 	}
 }
 
-func TestBodyParserAllAtIt(t *testing.T) {
-	var tl TokenList
-
-	tl = tl.Append(
-		BaseToken{tType: DashType, value: "-"},
-		BaseToken{tType: StarType, value: "*"},
-		BaseToken{tType: StarType, value: "*"},
-		BaseToken{tType: TextType, value: "EPIC"},
-		BaseToken{tType: StarType, value: "*"},
-		BaseToken{tType: StarType, value: "*"},
-		BaseToken{tType: NewlineType, value: "\n"},
-		BaseToken{tType: DashType, value: "-"},
-		BaseToken{tType: TextNode, value: "Testing"},
-		BaseToken{tType: NewlineType, value: "\n"},
-		BaseToken{tType: DashType, value: "-"},
-		BaseToken{tType: TextNode, value: "Testing"},
-		BaseToken{tType: NewlineType, value: "\n"},
-		BaseToken{tType: TextNode, value: "Testing"},
-		BaseToken{tType: NewlineType, value: "\n"},
-		BaseToken{tType: NewlineType, value: "\n"},
-		BaseToken{tType: TextNode, value: "Testing"},
-		BaseToken{tType: EOFType, value: ""},
-	)
-	node, _ := BodyParser(tl)
-
-	if node.nType != BodyNode {
-		t.Errorf("Node should be body type, not %s", node.nType)
-	}
-
-}
-
 func TestTextParser(t *testing.T) {
 	var tl TokenList
 
